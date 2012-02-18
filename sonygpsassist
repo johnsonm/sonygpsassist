@@ -22,6 +22,16 @@
 # IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# This is intended to be a very minimal shell script that implements
+# fetching GPS almanac data from Sony for Sony cameras with GPS, and
+# writing that data to an SD card that is currently mounted.  It is
+# trivial.  Please modify it.  It has been tested on exactly one Linux
+# system and one Sony camera.
+#
+# The URLs and filename I learned from looking at the source code to
+# gpsassist-update http://code.google.com/p/gpsassist-update/ but I
+# obviously copied no code.
+
 die ()
 {
     echo $*
