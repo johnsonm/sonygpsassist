@@ -43,16 +43,25 @@ cd $HOME || die no home "$HOME"
 
 cd .sonygpsassist
 
-curl http://control.d-imaging.sony.co.jp/GPS/assistme.dat > assistme.dat || die failed to get data file
 curl http://control.d-imaging.sony.co.jp/GPS/assistme.md5 > assistme.md5 || die failed to get md5 file
-echo "$(cat assistme.md5)assistme.dat" | md5sum -c - || die md5 check failed
+if echo "$(cat assistme.md5)assistme.dat" | md5sum -c - ; then
+    echo using already-cached data
+else
+    # must need a new copy
+    curl http://control.d-imaging.sony.co.jp/GPS/assistme.dat > assistme.dat || die failed to get data file
+    echo "$(cat assistme.md5)assistme.dat" | md5sum -c - || die md5 check failed
+fi
 
 for dir in $(cat /proc/mounts | awk '{print $2}' | grep media) ; do
-    if [ -d $dir/PRIVATE/SONY/GPS ] ; then
-        if cp assistme.dat $dir/PRIVATE/SONY/GPS/ ; then
-            echo copied assistme.dat to $dir/PRIVATE/SONY/GPS/
+    if [ -d "${dir}/PRIVATE/SONY" ] ; then
+        if [ ! -d "${dir}/PRIVATE/SONY/GPS" ] ; then
+            mkdir "${dir}/PRIVATE/SONY/GPS" || die failed to create GPS dir
+            echo created GPS data directory
+        fi
+        if cp assistme.dat "${dir}/PRIVATE/SONY/GPS/" ; then
+            echo copied assistme.dat to "${dir}/PRIVATE/SONY/GPS/"
         else
-            die failed to copy assistme.dat to $dir/PRIVATE/SONY/GPS/
+            die failed to copy assistme.dat to "${dir}/PRIVATE/SONY/GPS/"
         fi
     fi
 done
