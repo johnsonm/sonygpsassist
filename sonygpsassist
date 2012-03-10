@@ -44,7 +44,7 @@ cd $HOME || die no home "$HOME"
 cd .sonygpsassist
 
 curl http://control.d-imaging.sony.co.jp/GPS/assistme.md5 > assistme.md5 || die failed to get md5 file
-if echo "$(cat assistme.md5)assistme.dat" | md5sum -c - ; then
+if [ -f assistme.dat ] && echo "$(cat assistme.md5)assistme.dat" | md5sum -c - ; then
     echo using already-cached data
 else
     # must need a new copy
