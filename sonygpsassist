@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2012 Michael K Johnson
+# Copyright (C) 2012-2013 Michael K Johnson
 # 
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -52,18 +52,24 @@ else
     echo "$(cat assistme.md5)assistme.dat" | md5sum -c - || die md5 check failed
 fi
 
+FOUND=0
 for dir in $(cat /proc/mounts | awk '{print $2}' | grep media) ; do
-    if [ -d "${dir}/PRIVATE/SONY" ] ; then
+    if [ -d "${dir}/PRIVATE" -a -d "${dir}/DCIM" ] ; then
         if [ ! -d "${dir}/PRIVATE/SONY/GPS" ] ; then
-            mkdir "${dir}/PRIVATE/SONY/GPS" || die failed to create GPS dir
-            echo created GPS data directory
+            mkdir -p "${dir}/PRIVATE/SONY/GPS" || die failed to create GPS dir
+            echo created GPS data directory PRIVATE/SONY/GPS
         fi
         if cp assistme.dat "${dir}/PRIVATE/SONY/GPS/" ; then
             echo copied assistme.dat to "${dir}/PRIVATE/SONY/GPS/"
+            FOUND=1
         else
             die failed to copy assistme.dat to "${dir}/PRIVATE/SONY/GPS/"
         fi
     fi
 done
+
+[ $FOUND -eq 0 ] && {
+    die "No memory card found (mount with PRIVATE and DCIM)"
+}
 
 exit 0
